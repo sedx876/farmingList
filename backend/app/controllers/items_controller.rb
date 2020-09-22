@@ -11,7 +11,7 @@ class ItemsController < ApplicationController
   end
 
   def create
-    @item = items.build(item_params)
+    @item = Item.new(item_params)
     if @item.save
       render json: ItemSerializer.new(@item)
     else

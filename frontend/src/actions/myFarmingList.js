@@ -20,6 +20,13 @@ export const deleteItemSuccess = itemId => {
   }
 }
 
+export const updateItemSuccess = item => {
+  return {
+    type: 'UPDATE_ITEM',
+    item
+  }
+}
+
 export const addItem = item => {
   return {
     type: 'ADD_ITEM',
@@ -47,7 +54,7 @@ export const getMyItems = () => {
   }
 }
 
-export const createItem = (itemData) => {
+export const createItem = (itemData, history) => {
   return dispatch => {
     const sendableItemData = {
       name: itemData.name
@@ -66,13 +73,39 @@ export const createItem = (itemData) => {
       } else {
         dispatch(addItem(resp.data))
         dispatch(resetFarmingListForm())
+        history.push(`/items/${resp.data.id}`)
       }
     })
     .catch(console.log)
   }
 }
 
-export const deleteItem = (itemId) => {
+export const updateItem = (itemData, history) => {
+  return dispatch => {
+    const sendableItemData = {
+      name: itemData.name
+    }
+    return fetch(`http://localhost:3001/items/${itemData.itemId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(sendableItemData)
+    })
+    .then(r => r.json())
+    .then(resp => {
+      if (resp.error) {
+        alert(resp.error)
+      } else {
+        dispatch(updateItemSuccess(resp.data))
+        history.push(`/items/${resp.data.id}`)
+      }
+    })
+    .catch(console.log)
+  }
+}
+
+export const deleteItem = (itemId, history) => {
   return dispatch => {
     return fetch(`http://localhost:3001/items/${itemId}`, {
       method: 'DELETE',
@@ -86,6 +119,7 @@ export const deleteItem = (itemId) => {
         alert(resp.error)
       } else {
         dispatch(deleteItemSuccess(itemId))
+        history.push(`/items`)
       }
     })
     .catch(console.log)
